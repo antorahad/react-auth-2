@@ -1,5 +1,6 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import auth from "./Firebase";
 
 const Register = () => {
@@ -10,7 +11,8 @@ const Register = () => {
         e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
-        console.log(email, password)
+        const accepted = e.target.terms.checked;
+        console.log(email, password, accepted);
         setRegisterSuccess('');
         setRegisterError ('');
         if(password.length < 6 ){
@@ -18,6 +20,10 @@ const Register = () => {
             return;
         }else if (!/[A-Z]/.test(password)){
             setRegisterError('Your Password should have at least one uppercase letter');
+            return;
+        }
+        else if (!accepted){
+            setRegisterError('Please accept the terms first');
             return;
         }
         createUserWithEmailAndPassword(auth, email, password)
@@ -50,7 +56,14 @@ const Register = () => {
                 placeholder='Password' required />
                 <span onClick={() => setShowPassword(!showPassword)}>Show</span>
                 <br />
+                <div className="flex items-center gap-3">
+                <input type="checkbox" name="terms" id="terms" />
+                <label htmlFor="terms">Accept our <a href="#" className="underline text-pink-400">terms and conditions</a></label>
+                </div>
+                <br />
                 <button className='btn btn-primary'>Register</button>
+                <br />
+                <p>{`Already have an account?`} <Link className="underline text-[green]" to={'/login'}>Go to Login</Link></p>
             </form>
             {
                 registerSuccess && 
