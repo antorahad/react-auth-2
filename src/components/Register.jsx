@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import auth from "./Firebase";
@@ -9,10 +9,11 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
     const handleRegister = e => {
         e.preventDefault();
+        const name = e.target.name.value;
         const email = e.target.email.value;
         const password = e.target.password.value;
         const accepted = e.target.terms.checked;
-        console.log(email, password, accepted);
+        console.log(name, email, password, accepted);
         setRegisterSuccess('');
         setRegisterError ('');
         if(password.length < 6 ){
@@ -30,8 +31,20 @@ const Register = () => {
         .then((userCredential) => {
             // Signed up 
             const user = userCredential.user;
+            console.log(user)
             setRegisterSuccess('Account Created Successfully');
             // ...
+
+            updateProfile(user, {
+                displayName: name,
+                photoURL: "https://example.com/jane-q-user/profile.jpg"
+            })
+            .then(() => console.log('profile updated'))
+            .catch(error => console.log(error))
+            sendEmailVerification(user)
+            .then(() => {
+                alert('Please verify your email');
+            })
           })
           .catch((error) => {
             const errorMessage = error.message;
@@ -48,6 +61,8 @@ const Register = () => {
             <br />
             <br />
             <form onSubmit={handleRegister} className='flex items-center justify-center flex-col'>
+                <input className='input input-primary' name='name' type="text" placeholder='Name' required/>
+                <br />
                 <input className='input input-primary' name='email' type="email" placeholder='Email' required/>
                 <br />
                 <input 

@@ -17,7 +17,14 @@ const Login = () => {
         setLoginError('');
         setLoginSuccess('')
         signInWithEmailAndPassword(auth,email,password)
-        .then(result => setLoginSuccess('login successful'))
+        .then(result => {
+            console.log(result.user);
+            if(result.user.emailVerified){
+                setLoginSuccess('login successful')
+            }else{
+                setLoginError('Your email is not verified')
+            }
+        })
         .catch(error => setLoginError(error.message))
     }
     const handleForgotPassword = () => {
