@@ -1,4 +1,5 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
+import { useRef } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import auth from "./Firebase";
@@ -7,6 +8,7 @@ import auth from "./Firebase";
 const Login = () => {
     const [loginError, setLoginError] = useState('');
     const [loginSuccess, setLoginSuccess] = useState('');
+    const emailRef = useRef(null);
     const handleLogin = e => {
         e.preventDefault()
         const email = e.target.email.value;
@@ -19,7 +21,16 @@ const Login = () => {
         .catch(error => setLoginError(error.message))
     }
     const handleForgotPassword = () => {
-        console.log('clicked')
+        const email = emailRef.current.value;
+        if(!email){
+            console.log('kanker sele email de');
+            return;
+        }
+        sendPasswordResetEmail(auth, email)
+        .then(() => {
+            alert('email check koro chodna');
+        })
+        .catch(error => console.log(error));
     }
     return (
         <div>
@@ -29,7 +40,7 @@ const Login = () => {
             <br />
             <br />
             <form onSubmit={handleLogin} className='flex items-center justify-center flex-col'>
-                <input className='input input-primary' name='email' type="email" placeholder='Email' />
+                <input className='input input-primary' ref={emailRef} name='email' type="email" placeholder='Email' />
                 <br />
                 <input className='input input-primary' name='password' type="password" placeholder='Password' />
                 <br />
